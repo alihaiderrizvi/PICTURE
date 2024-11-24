@@ -1,3 +1,4 @@
+import os
 import torch
 import torch.nn as nn
 import math
@@ -130,8 +131,13 @@ class FrozenCLIPEmbedder(AbstractEncoder):
                  freeze=True, layer="last"):  # clip-vit-base-patch32
         super().__init__()
         version = '/data2/zzz/SDM/ControlNet/clip-vit-large-patch14'
-        self.tokenizer = CLIPTokenizer.from_pretrained(version)
-        self.transformer = CLIPModel.from_pretrained(version).text_model
+        if os.path.exists(version):
+            self.tokenizer = CLIPTokenizer.from_pretrained(version)
+            self.transformer = CLIPModel.from_pretrained(version).text_model
+        else:
+            print("Loading CLIP from HuggingFace: openai/clip-vit-large-patch14")
+            self.tokenizer = CLIPTokenizer.from_pretrained("openai/clip-vit-large-patch14")
+            self.transformer = CLIPModel.from_pretrained("openai/clip-vit-large-patch14").text_model
         self.device = device
         self.max_length = max_length
         if freeze:

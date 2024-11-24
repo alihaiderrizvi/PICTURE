@@ -20,9 +20,9 @@ def init_dist(launcher, backend='nccl', **kwargs):
 
 
 def _init_dist_pytorch(backend, **kwargs):
-    rank = int(os.environ['RANK'])
-    num_gpus = torch.cuda.device_count()
-    torch.cuda.set_device(rank % num_gpus)
+    # rank = int(os.environ['RANK'])
+    # num_gpus = torch.cuda.device_count()
+    torch.cuda.set_device(0)
     dist.init_process_group(backend=backend, **kwargs)
 
 
@@ -59,17 +59,17 @@ def _init_dist_slurm(backend, port=None):
 
 
 def get_dist_info():
-    if dist.is_available():
-        initialized = dist.is_initialized()
-    else:
-        initialized = False
-    if initialized:
-        rank = dist.get_rank()
-        world_size = dist.get_world_size()
-    else:
-        rank = 0
-        world_size = 1
-    return rank, world_size
+    # if dist.is_available():
+    #     initialized = dist.is_initialized()
+    # else:
+    #     initialized = False
+    # if initialized:
+    #     rank = dist.get_rank()
+    #     world_size = dist.get_world_size()
+    # else:
+    #     rank = 0
+    #     world_size = 1
+    return 0, 1
 
 
 def master_only(func):
