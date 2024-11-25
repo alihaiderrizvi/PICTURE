@@ -264,7 +264,7 @@ if __name__ == '__main__':
 
     #======================================================   load  checkpoint ==========================================
     model = load_model_from_config(config, f"{opt.ckpt}").to(device)
-    model.load_state_dict(torch.load('./../pretrain_models/Stage1/model_15000.pth'))
+    model.load_state_dict(torch.load('./../pretrain_models/Stage1/model_15000.pth'), strict=False)
     model.first_stage_model.init_from_ckpt('./../pretrain_models/vae-ft-mse.ckpt')
 
 
@@ -278,14 +278,14 @@ if __name__ == '__main__':
 
     
     
-    model = torch.nn.parallel.DistributedDataParallel(
+    model = torch.nn.parallel.DataParallel(
         model,
         device_ids=[opt.local_rank], 
         output_device=opt.local_rank)
         # device_ids=[torch.cuda.current_device()])
 
     
-    clip_model = torch.nn.parallel.DistributedDataParallel(
+    clip_model = torch.nn.parallel.DataParallel(
         clip_model,
         device_ids=[opt.local_rank], 
         output_device=opt.local_rank)
@@ -318,7 +318,7 @@ if __name__ == '__main__':
         logger.info(get_env_info())
         logger.info(dict2str(config))
         resume_optimizers = resume_state['optimizers']
-        optimizer.load_state_dict(resume_optimizers)
+        optimizer.load_state_dict(resume_optimizers, strict=False)
         logger.info(f"Resuming training from epoch: {resume_state['epoch']}, " f"iter: {resume_state['iter']}.")
         start_epoch = resume_state['epoch']
         current_iter = resume_state['iter']

@@ -281,30 +281,30 @@ if __name__ == '__main__':
     print(len(test_dataloader))
     # model related
     model = load_model_from_config(config, f"{opt.ckpt}").to(device)
-    model.load_state_dict(torch.load('./../pretrain_models/Stage2/model_210000.pth'))
+    model.load_state_dict(torch.load('./../pretrain_models/Stage2/model_210000.pth'), strict=False)
     model.first_stage_model.init_from_ckpt('./../pretrain_models/vae-ft-mse.ckpt')
     mlp_layer0 = MLP_Adapter(dim=1024).to(device)
-    mlp_layer0.load_state_dict(torch.load('./../pretrain_models/Stage2/mlp_layer0_210000.pth'))
+    mlp_layer0.load_state_dict(torch.load('./../pretrain_models/Stage2/mlp_layer0_210000.pth'), strict=False)
     clip_model, preprocess = clip.load("ViT-L/14", device=device)
 
 
     # to gpus
 
     
-    mlp_layer0 = torch.nn.parallel.DistributedDataParallel(
+    mlp_layer0 = torch.nn.parallel.DataParallel(
         mlp_layer0,
         device_ids=[opt.local_rank], 
         output_device=opt.local_rank)
     
 
-    model = torch.nn.parallel.DistributedDataParallel(
+    model = torch.nn.parallel.DataParallel(
         model,
         device_ids=[opt.local_rank], 
         output_device=opt.local_rank)
         # device_ids=[torch.cuda.current_device()])
 
     
-    clip_model = torch.nn.parallel.DistributedDataParallel(
+    clip_model = torch.nn.parallel.DataParallel(
         clip_model,
         device_ids=[opt.local_rank], 
         output_device=opt.local_rank)
@@ -337,7 +337,7 @@ if __name__ == '__main__':
         logger.info(get_env_info())
         logger.info(dict2str(config))
         resume_optimizers = resume_state['optimizers']
-        optimizer.load_state_dict(resume_optimizers)
+        optimizer.load_state_dict(resume_optimizers, strict=False)
         logger.info(f"Resuming training from epoch: {resume_state['epoch']}, " f"iter: {resume_state['iter']}.")
         start_epoch = resume_state['epoch']
         current_iter = resume_state['iter']

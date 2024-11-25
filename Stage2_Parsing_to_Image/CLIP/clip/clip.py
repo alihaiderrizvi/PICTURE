@@ -117,7 +117,7 @@ def load(name: str, device: Union[str, torch.device] = "cuda" if torch.cuda.is_a
         A torchvision transform that converts a PIL image into a tensor that the returned model can take as its input
     """
     if name in _MODELS:
-        model_path = '/data1/shuliang/CVPR_Code_Release/pretrain_models/ViT-L-14.pt'
+        model_path = './../pretrain_models/ViT-L-14.pt'
         # model_path = _download(_MODELS[name], download_root or os.path.expanduser("~/.cache/clip"))
     elif os.path.isfile(name):
         model_path = name
